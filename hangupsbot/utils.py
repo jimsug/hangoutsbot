@@ -1,9 +1,13 @@
-import importlib
-import unicodedata
+import importlib, logging, unicodedata
 
 import hangups
 
 from parsers import simple_parse_to_segments, segment_to_html
+
+from permamem import name_from_hangups_conversation
+
+
+logger = logging.getLogger(__name__)
 
 
 def text_to_segments(text):
@@ -24,6 +28,11 @@ def text_to_segments(text):
         segments.append(hangups.ChatMessageSegment(lines[-1]))
 
     return segments
+
+
+def remove_accents(text):
+    """remove accents from unicode text, allows east asian languages through"""
+    return ''.join(c for c in unicodedata.normalize('NFD', text) if unicodedata.category(c) != 'Mn')
 
 
 def unicode_to_ascii(text):
