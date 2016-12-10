@@ -37,7 +37,7 @@ def _migrate_mention_config_to_memory(bot):
 
 def _handle_mention(bot, event, command):
     """handle @mention"""
-    occurrences = [word for word in event.text.split() if word.startswith('@')]
+    occurrences = [word for word in event.text.split() if (word.startswith('@') and word[1].isalpha())]
     if len(occurrences) > 0:
         for word in occurrences:
             # strip all special characters
@@ -269,7 +269,7 @@ def mention(bot, event, *args):
 
         if send_multiple_user_message or noisy_mention_test:
             if conv_1on1_initiator:
-                text_html = _('{} users would be mentioned with "@{}"! Be more specific. List of matching users:<br />').format(
+                text_html = _('{} users would be mentioned with "@{}"! <b>No users mentioned.</b> Be more specific. List of matching users:<br />').format(
                     len(mention_list), username, conversation_name)
 
                 for u in mention_list:
@@ -303,11 +303,12 @@ def mention(bot, event, *args):
                         success = False
                         try:
                             pb = PushBullet(pushbullet_config["api"])
-                            push = pb.push_note(
-                                _("{} mentioned you in {}").format(
+                            push = pb.push_link(
+                                title=("{} mentioned you in {}").format(
                                         source_name,
                                         conversation_name),
-                                    event.text)
+                                    body=event.text,
+                                    url='https://hangouts.google.com/chat/{}'.format(event.conv.id_))
                             if isinstance(push, tuple):
                                 # backward-compatibility for pushbullet library < 0.8.0
                                 success = push[0]

@@ -165,6 +165,9 @@ class EventHandler:
         if not isinstance(self.bot_command, list):
             self.bot_command = [self.bot_command]
 
+        if event.text[0] == "!":
+            event.text = "/bot " + event.text[1:]
+
         # check that a bot alias is used e.g. /bot
         if not event.text.split()[0].lower() in self.bot_command:
             return
